@@ -25,7 +25,60 @@ router.get('/', function (req, res, next) {
 });
 
 //CREATE POST
+router.post('/store', function (req, res, next) {
+    
+    let Nama_Produk   = req.body.Nama_Produk;
+    let Harga = req.body.Harga;
+    let errors  = false;
 
+    if(Nama_Produk.length === 0) {
+        errors = true;
+
+        // set flash message
+        req.flash('error', "Silahkan Masukkan Nama_Produk");
+        // render to add.ejs with flash message
+        res.render('posts/create', {
+            Nama_Produk: Nama_Produk,
+            Harga: Harga
+        })
+    }
+
+    if(Harga.length === 0) {
+        errors = true;
+
+        req.flash('error', "Silahkan Masukkan Konten");
+        res.render('posts/create', {
+            Nama_Produk: Nama_Produk,
+            Harga: Harga
+        })
+    }
+
+    if(!errors) {
+
+        let formData = {
+            Nama_Produk: Nama_Produk,
+            Harga: Harga
+        }
+        
+        // insert query
+        connection.query('INSERT INTO posts SET ?', formData, function(err, result) {
+            //if(err) throw err
+            if (err) {
+                req.flash('error', err)
+                 
+                // render to add.ejs
+                res.render('posts/create', {
+                    Nama_Produk: formData.Nama_Produk,
+                    Harga: formData.Harga                    
+                })
+            } else {                
+                req.flash('success', 'Data Berhasil Disimpan!');
+                res.redirect('/posts');
+            }
+        })
+    }
+
+})
 
 // EDIT/UPDATE
 
