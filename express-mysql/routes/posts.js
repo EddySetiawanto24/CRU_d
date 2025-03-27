@@ -81,7 +81,93 @@ router.post('/store', function (req, res, next) {
 })
 
 // EDIT/UPDATE
+router.get('/edit/(:id)', function(req, res, next) {
 
+    let id = req.params.id;
+   
+    connection.query('SELECT * FROM posts WHERE ID = ' + id, function(err, rows, fields) {
+        if(err) throw err
+         
+        // if user not found
+        if (rows.length <= 0) {
+            req.flash('error', 'Data Post Dengan ID ' + id + " Tidak Ditemukan")
+            res.redirect('/posts')
+        }
+        // if book found
+        else {
+            // render to edit.ejs
+            res.render('posts/edit', {
+                id:      rows[0].id,
+                Nama_Produk:   rows[0].Nama_Produk,
+                Harga: rows[0].Harga
+            })
+        }
+    })
+ })
+ 
+ /**
+ * UPDATE POST
+ */
+ router.post('/update/:id', function(req, res, next) {
+ 
+    let id      = req.params.id;
+    let Nama_Produk   = req.body.Nama_Produk;
+    let Harga = req.body.Harga;
+    let errors  = false;
+ 
+    if(Nama_Produk.length === 0) {
+        errors = true;
+ 
+        // set flash message
+        req.flash('error', "Silahkan Masukkan Nama_Produk");
+        // render to edit.ejs with flash message
+        res.render('posts/edit', {
+            id:         req.params.id,
+            Nama_Produk:      Nama_Produk,
+            Harga:    Harga
+        })
+    }
+ 
+    if(Harga.length === 0) {
+        errors = true;
+ 
+        // set flash message
+        req.flash('error', "Silahkan Masukkan Konten");
+        // render to edit.ejs with flash message
+        res.render('posts/edit', {
+            id:         req.params.id,
+            Nama_Produk:      Nama_Produk,
+            Harga:    Harga
+        })
+    }
+ 
+    // if no error
+    if( !errors ) {   
+ 
+        let formData = {
+            Nama_Produk: Nama_Produk,
+            Harga: Harga
+        }
+ 
+        // update query
+        connection.query('UPDATE posts SET ? WHERE id = ' + id, formData, function(err, result) {
+            //if(err) throw err
+            if (err) {
+                // set flash message
+                req.flash('error', err)
+                // render to edit.ejs
+                res.render('posts/edit', {
+                    id:     req.params.id,
+                    name:   formData.name,
+                    author: formData.author
+                })
+            } else {
+                req.flash('success', 'Data Berhasil Diupdate!');
+                res.redirect('/posts');
+            }
+        })
+    }
+ })
 
 // DELETE
 
