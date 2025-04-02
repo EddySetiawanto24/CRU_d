@@ -24,12 +24,15 @@
 
                 <div class="card border-0 shadow rounded">
                     <div class="card-body">
-                        <a href="/posts/create" class="btn btn-md btn-success mb-3">TAMBAH POST</a>
+                        <a href="posts/create" class="btn btn-md btn-success mb-3">TAMBAH POST</a>
                         <table class="table table-bordered">
                             <thead>
                               <tr>
                                 <th scope="col">ID</th>
+                                <th scope="col">Gambar</th>
                                 <th scope="col">Nama Produk</th>
+                                <th scope="col">Deskripsi</th>
+                                <th scope="col">Stok</th>
                                 <th scope="col">Harga</th>
                               </tr>
                             </thead>
@@ -39,8 +42,13 @@
                                     for(var i = 0; i< data.length; i++) {%>  
                                         <tr>
                                             <th scope="row" class="text-center"><%= (i+1) %></th>
-                                            <td><%= data[i].Nama_Produk %></td>
-                                            <td><%= data[i].Harga %></td>
+                                            <td>
+                                                <img src="/uploads/<%= data[i].gambar_produk %>" alt="<%= data[i].gambar_produk %>" style="width: 130px; height: auto;">
+                                            </td>
+                                            <td><%= data[i].nama_produk%></td>
+                                            <td><%= data[i].deskripsi%></td>
+                                            <td><%= data[i].stok%></td>
+                                            <td><%= data[i].harga%></td>
                                             <td class="text-center">
                                                 <a href="/posts/edit/<%=data[i].id%>" class="btn btn-sm btn-primary">EDIT</a>
                                                 <a onclick="return alert('Are You sure?')" href="/posts/delete/<%=data[i].id%>" class="btn btn-sm btn-danger">HAPUS</a>

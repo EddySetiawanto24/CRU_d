@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Trendify</title>
+    <title>Trendy</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
@@ -17,17 +17,33 @@
             <div class="col-md-12">
                 <% if (messages.error) { %>
                     <div class="alert alert-danger" role="alert"><%- messages.error %></div>
-                <% } %>
+                    <% } %>
                 <div class="card border-0 shadow rounded">
                     <div class="card-body">
-                        <form action="/posts/update/<%= id %>" method="post">
+                        <form action="posts/update/<%= id %>" method="post" enctype="multipart/form-data">
                             <div class="form-group">
-                                <label>Nama Produk</label>
-                                <input type="text" class="form-control" name="Nama_Produk" value="<%= Nama_Produk %>" placeholder="Masukkan Nama Produk">
+                                <label>Gambar Produk</label>
+                                <div>
+                                    <img src="/uploads/<%= gambar_produk %>" alt="<%= gambar_produk %>" style="width: 130px; height: auto;">
+                                </div>
+                                <input type="file" class="form-control" name="gambar">
+                                <input type="hidden" name="old_gambar" value="<%= gambar %>">
+                            </div>
+                            <div class="form-group">
+                                <label>Nama</label>
+                                <input type="text" class="form-control" name="nama" value="<%= nama %>" placeholder="Masukkan Title Post">
+                            </div>
+                            <div class="form-group">
+                                <label>Deskripsi</label>
+                                <textarea class="form-control" name="deskripsi" rows="5" placeholder="Masukkan Konten Post"><%= deskripsi %></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Stok</label>
+                                <textarea class="form-control" name="stok" rows="5" placeholder="Masukkan Konten Post"><%= stok %></textarea>
                             </div>
                             <div class="form-group">
                                 <label>Harga</label>
-                                <input type="text" class="form-control" name="Harga" value="<%= Harga %>" placeholder="Masukkan Harga Produk">
+                                <textarea class="form-control" name="harga" rows="5" placeholder="Masukkan Konten Post"><%= harga %></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary">UPDATE</button>
                             <button type="reset" class="btn btn-warning">RESET</button>

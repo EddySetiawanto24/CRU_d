@@ -1,208 +1,223 @@
 var express = require('express');
 var router = express.Router();
+var multer = require('multer');
+var path = require('path');
 
-//import database
+// Import database
 var connection = require('../library/database');
 
-/**
- * INDEX POSTS
- */
+// Set storage engine
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './public/uploads/');
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+// Init upload
+var upload = multer({
+    storage: storage,
+    limits: { fileSize: 1000000 }, 
+    fileFilter: function(req, file, cb) {
+        checkFileType(file, cb);
+    }
+}).single('gambar_produk');
+
+function checkFileType(file, cb) {
+    var filetypes = /jpeg|jpg|png|gif/;
+    var extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    var mimetype = filetypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+        return cb(null, true);
+    } else {
+        cb('Error: Images Only!');
+    }
+}
+
+// INDEX POSTS
 router.get('/', function (req, res, next) {
-    //query
-    connection.query('SELECT * FROM posts ORDER BY id desc', function (err, rows) {
+    connection.query('SELECT * FROM posts ORDER BY id DESC', function (err, rows) {
         if (err) {
             req.flash('error', err);
-            res.render('posts', {
-                data: ''
-            });
+            res.render('posts/index', {messages: req.flash(), data: ''});
         } else {
-            //render ke view posts index
-            res.render('posts/index', {
-                data: rows // <-- data posts
+            res.render('posts/index', {messages: req.flash(), data: rows });
+        }
+    });
+});
+
+// CREATE POST
+router.get('/create', function (req, res, next) {
+    res.render('posts/create', {
+        gambar_produk: '',
+        nama_produk: '',
+        deskripsi: '',
+        stok: '',
+        harga: ''
+    });
+});
+
+// STORE POST
+router.post('/store', function (req, res, next) {
+    upload(req, res, function (err) {
+        console.log('Headers:', req.headers);
+        console.log('Body:', req.body);
+        console.log('File:', req.file); // Cek apakah multer menangkap file
+
+        if (err) {
+            console.error('Multer Error:', err);
+            req.flash('error', 'Error uploading file.');
+            return res.redirect('/posts/create');
+        }
+
+        if (!req.file) {
+            req.flash('error', 'Silakan masukkan gambar produk');
+            return res.redirect('/posts/create');
+        }
+
+        var gambar_produk = req.file.filename;
+        var { nama_produk, deskripsi, stok, harga } = req.body;
+
+        if (!nama_produk || !deskripsi || !stok || !harga) {
+            req.flash('error', 'Silakan lengkapi semua kolom');
+            return res.redirect('/posts/create');
+        }
+
+        var formData = { gambar_produk, nama_produk, deskripsi, stok, harga };
+        connection.query('INSERT INTO posts SET ?', formData, function(err, result) {
+            if (err) {
+                req.flash('error', 'Gagal menyimpan data. Silakan coba lagi.');
+                return res.redirect('/posts/create');
+            } else {
+                req.flash('success', 'Data berhasil disimpan!');
+                return res.redirect('/posts');
+            }
+        });
+    });
+});
+
+
+// EDIT POST
+router.get('/edit/(:id)', function(req, res, next) {
+    let id = req.params.id;
+
+    connection.query('SELECT * FROM posts WHERE id = ?', [id], function(err, rows, fields) {
+        if(err) throw err;
+
+        if (rows.length <= 0) {
+            req.flash('error', 'Data Post Dengan ID ' + id + ' Tidak Ditemukan');
+            return res.redirect('/posts');
+        } else {
+            res.render('posts/edit', {
+                id: rows[0].id,
+                gambar: rows[0].gambar,
+                nama: rows[0].nama,
+                deskripsi: rows[0].deskripsi,
+                stok: rows[0].stok,
+                harga: rows[0].harga
             });
         }
     });
 });
 
-/**
- * CREATE POST
- */
-router.get('/create', function (req, res, next) {
-    res.render('posts/create', {
-        Nama_Produk: '',
-        Harga: ''
-    })
-})
+// UPDATE POST
+router.post('/update/:id', function (req, res, next) {
+    upload(req, res, function(err) {
+        if (err) {
+            req.flash('error', 'Error uploading file.');
+            console.error('Upload Error:', err);
+            return res.redirect('/posts/edit/' + req.params.id);
+        }
 
-/**
- * STORE POST
- */
-router.post('/store', function (req, res, next) {
-    
-    let Nama_Produk   = req.body.Nama_Produk;
-    let Harga = req.body.Harga;
-    let errors  = false;
+        let id = req.params.id;
+        let nama_produk = req.body.nama_produk;
+        let deskripsi = req.body.deskripsi; 
+        let stok = req.body.stok; 
+        let harga = req.body.harga;
+        let old_gambar = req.body.old_gambar;
+        let gambar_produk = req.file ? req.file.filename : old_gambar;
+        let errors = false;
 
-    if(Nama_Produk.length === 0) {
-        errors = true;
+        console.log('Nama Produk:', nama_produk);
+        console.log('Deskripsi:', deskripsi);
+        console.log('Deskripsi:', stok);
+        console.log('Harga:', harga);
+        console.log('Old Gambar:', old_gambar);
+        console.log('Gambar:', gambar_produk);
 
-        // set flash message
-        req.flash('error', "Silahkan Masukkan Nama_Produk");
-        // render to add.ejs with flash message
-        res.render('posts/create', {
-            Nama_Produk: Nama_Produk,
-            Harga: Harga
-        })
-    }
+        if (!nama_produk) {
+            errors = true;
+            req.flash('error', "Silahkan Masukkan Nama Produk");
+        }
 
-    if(Harga.length === 0) {
-        errors = true;
+        if (!deskripsi) {
+            errors = true;
+            req.flash('error', "Silahkan Masukkan Deskripsi Produk");
+        }
+        if (!stok) {
+            errors = true;
+            req.flash('error', "Silahkan Masukkan Stok Produk");
+        }
 
-        // set flash message
-        req.flash('error', "Silahkan Masukkan Konten");
-        // render to add.ejs with flash message
-        res.render('posts/create', {
-            Nama_Produk: Nama_Produk,
-            Harga: Harga
-        })
-    }
+        if (!harga) {
+            errors = true;
+            req.flash('error', "Silahkan Masukkan Resep Produk");
+        }
 
-    // if no error
-    if(!errors) {
+        if (errors) {
+            return res.render('posts/edit', {
+                id: id,
+                nama_produk: nama_produk,
+                deskripsi: deskripsi,
+                stok: stok,
+                harga: harga,
+                gambar: old_gambar
+            });
+        }
 
         let formData = {
-            Nama_Produk: Nama_Produk,
-            Harga: Harga
-        }
-        
-        // insert query
-        connection.query('INSERT INTO posts SET ?', formData, function(err, result) {
-            //if(err) throw err
+            gambar_produk: gambar_produk,
+            nama_produk: nama_produk,
+            deskripsi: deskripsi,
+            stok: stok,
+            harga: harga
+        };
+
+        connection.query('UPDATE posts SET ? WHERE id = ?', [formData, id], function(err, result) {
             if (err) {
-                req.flash('error', err)
-                 
-                // render to add.ejs
-                res.render('posts/create', {
-                    Nama_Produk: formData.Nama_Produk,
-                    Harga: formData.Harga                    
-                })
-            } else {                
-                req.flash('success', 'Data Berhasil Disimpan!');
-                res.redirect('/posts');
+                req.flash('error', err);
+                return res.render('posts/edit', {
+                    id: id,
+                    nama_produk: nama_produk,
+                    deskripsi: deskripsi,
+                    stok: stok,
+                    harga: harga,
+                    gambar_produk: old_gambar
+                });
+            } else {
+                req.flash('success', 'Data Berhasil Diupdate!');
+                return res.redirect('/posts');
             }
-        })
-    }
+        });
+    });
+});
 
-})
-
-
-router.get('/edit/(:id)', function(req, res, next) {
-
-   let id = req.params.id;
-  
-   connection.query('SELECT * FROM posts WHERE ID = ' + id, function(err, rows, fields) {
-       if(err) throw err
-        
-       // if user not found
-       if (rows.length <= 0) {
-           req.flash('error', 'Data Post Dengan ID ' + id + " Tidak Ditemukan")
-           res.redirect('/posts')
-       }
-       // if book found
-       else {
-           // render to edit.ejs
-           res.render('posts/edit', {
-               id:      rows[0].id,
-               Nama_Produk:   rows[0].Nama_Produk,
-               Harga: rows[0].Harga
-           })
-       }
-   })
-})
-
-/**
-* UPDATE POST
-*/
-router.post('/update/:id', function(req, res, next) {
-
-   let id      = req.params.id;
-   let Nama_Produk   = req.body.Nama_Produk;
-   let Harga = req.body.Harga;
-   let errors  = false;
-
-   if(Nama_Produk.length === 0) {
-       errors = true;
-
-       // set flash message
-       req.flash('error', "Silahkan Masukkan Nama_Produk");
-       // render to edit.ejs with flash message
-       res.render('posts/edit', {
-           id:         req.params.id,
-           Nama_Produk:      Nama_Produk,
-           Harga:    Harga
-       })
-   }
-
-   if(Harga.length === 0) {
-       errors = true;
-
-       // set flash message
-       req.flash('error', "Silahkan Masukkan Konten");
-       // render to edit.ejs with flash message
-       res.render('posts/edit', {
-           id:         req.params.id,
-           Nama_Produk:      Nama_Produk,
-           Harga:    Harga
-       })
-   }
-
-   // if no error
-   if( !errors ) {   
-
-       let formData = {
-           Nama_Produk: Nama_Produk,
-           Harga: Harga
-       }
-
-       // update query
-       connection.query('UPDATE posts SET ? WHERE id = ' + id, formData, function(err, result) {
-           //if(err) throw err
-           if (err) {
-               // set flash message
-               req.flash('error', err)
-               // render to edit.ejs
-               res.render('posts/edit', {
-                   id:     req.params.id,
-                   name:   formData.name,
-                   author: formData.author
-               })
-           } else {
-               req.flash('success', 'Data Berhasil Diupdate!');
-               res.redirect('/posts');
-           }
-       })
-   }
-})
-
-
+// DELETE POST
 router.get('/delete/(:id)', function(req, res, next) {
-
     let id = req.params.id;
-     
-    connection.query('DELETE FROM posts WHERE id = ' + id, function(err, result) {
-        //if(err) throw err
+
+    connection.query('DELETE FROM posts WHERE id = ?', [id], function(err, result) {
         if (err) {
-            // set flash message
-            req.flash('error', err)
-            // redirect to posts page
-            res.redirect('/posts')
+            req.flash('error', 'Gagal menghapus data. Silakan coba lagi.');
+            return res.redirect('/posts');
         } else {
-            // set flash message
-            req.flash('success', 'Data Berhasil Dihapus!')
-            // redirect to posts page
-            res.redirect('/posts')
+            req.flash('success', 'Data Berhasil Dihapus!');
+            return res.redirect('/posts');
         }
-    })
-})
+    });
+});
 
 module.exports = router;

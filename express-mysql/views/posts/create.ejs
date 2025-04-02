@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 
-<body style="background: lightgray">
+<body style="background: rgb(241, 241, 241)">
 
     <div class="container mt-5">
         <div class="row">
@@ -20,14 +20,29 @@
                     <% } %>
                 <div class="card border-0 shadow rounded">
                     <div class="card-body">
-                        <form action="/posts/store" method="post">
+                        <form action="/posts/store" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                <label>Gambar Produk</label>
+                                <div>
+                                    <img src="/uploads/<%= gambar_produk %>" alt="<%= gambar_produk %>" style="width: 130px; height: auto;">
+                                </div>
+                                <input type="file" class="form-control" name="gambar_produk" value="<%= gambar_produk %>" placeholder="Masukkan Gambar Produk">
+                            </div>
                             <div class="form-group">
                                 <label>Nama Produk</label>
-                                <input type="text" class="form-control" name="Nama_Produk" value="<%= Nama_Produk %>" placeholder="Masukkan Nama Produk">
+                                <input type="text" class="form-control" name="nama_produk" value="<%= nama_produk %>" placeholder="Masukkan Nama Produk">
+                            </div>
+                            <div class="form-group">
+                                <label>Deskripsi</label>
+                                <input type="varchar" class="form-control" name="deskripsi" value="<%= deskripsi %>" placeholder="Masukkan Deskripsi Produk">
+                            </div>
+                            <div class="form-group">
+                                <label>Stok</label>
+                                <input type="int" class="form-control" name="stok" value="<%= stok %>" placeholder="Masukkan Stok Produk">
                             </div>
                             <div class="form-group">
                                 <label>Harga</label>
-                                <input type="text" class="form-control" name="Harga" value="<%= Harga %>" placeholder="Masukkan Harga Produk">
+                                <input type="double" class="form-control" name="harga" value="<%= harga %>" placeholder="Masukkan Harga Produk">
                             </div>
                             <button type="submit" class="btn btn-primary">SIMPAN</button>
                             <button type="reset" class="btn btn-warning">RESET</button>
