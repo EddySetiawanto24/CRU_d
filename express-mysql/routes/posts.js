@@ -113,8 +113,8 @@ router.get('/edit/(:id)', function(req, res, next) {
         } else {
             res.render('posts/edit', {
                 id: rows[0].id,
-                gambar: rows[0].gambar,
-                nama: rows[0].nama,
+                gambar_produk: rows[0].gambar_produk,
+                nama_produk: rows[0].nama_produk,
                 deskripsi: rows[0].deskripsi,
                 stok: rows[0].stok,
                 harga: rows[0].harga
@@ -174,7 +174,7 @@ router.post('/update/:id', function (req, res, next) {
                 deskripsi: deskripsi,
                 stok: stok,
                 harga: harga,
-                gambar: old_gambar
+                gambar_produk: old_gambar
             });
         }
 
