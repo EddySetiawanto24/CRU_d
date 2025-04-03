@@ -7,13 +7,124 @@
     <title>Trendify</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-</head>
-<body style="background: lightgray">
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            transition: background-color 0.3s ease;
+        }
 
-    <div class="container mt-5">
+        .container {
+            margin-top: 40px;
+        }
+
+        /* Card style */
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            margin-bottom: 30px;
+            padding: 2rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Table style */
+        table {
+            background-color: #fff;
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        th, td {
+            text-align: center;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #eb6715;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #eaeaea;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Button styles */
+        .btn-success, .btn-primary, .btn-danger {
+            border-radius: 25px;
+            font-weight: bold;
+            padding: 12px 30px;
+            font-size: 16px;
+        }
+
+        .btn-success:hover, .btn-primary:hover, .btn-danger:hover {
+            opacity: 0.85;
+            transform: scale(1.05);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .btn-sm {
+            padding: 8px 18px;
+            font-size: 14px;
+        }
+
+        /* Alert messages */
+        .alert {
+            border-radius: 8px;
+            padding: 18px;
+            font-size: 16px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 4%;
+            color: #eb6715;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Image styling */
+        img {
+            border-radius: 8px;
+            max-width: 150px;
+            height: auto;
+        }
+
+        /* Toast notifications */
+        .toast {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
-
+                
                 <% if (messages.success) { %>
                     <div class="alert alert-success" role="alert"><%- messages.success %></div>
                 <% } %>
@@ -22,49 +133,49 @@
                     <div class="alert alert-danger" role="alert"><%- messages.error %></div>
                 <% } %>
 
-                <div class="card border-0 shadow rounded">
+                <div class="card">
                     <div class="card-body">
+                        <h2>Menambahkan produk </h2>
                         <a href="posts/create" class="btn btn-md btn-success mb-3">TAMBAH POST</a>
                         <table class="table table-bordered">
                             <thead>
-                              <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Gambar</th>
-                                <th scope="col">Nama Produk</th>
-                                <th scope="col">Deskripsi</th>
-                                <th scope="col">Stok</th>
-                                <th scope="col">Harga</th>
-                              </tr>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Gambar</th>
+                                    <th scope="col">Nama Produk</th>
+                                    <th scope="col">Deskripsi</th>
+                                    <th scope="col">Stok</th>
+                                    <th scope="col">Harga</th>
+                                    <th scope="col">Aksi</th>
+                                </tr>
                             </thead>
                             <tbody>
-                                <% if(data.length){
-                                    
-                                    for(var i = 0; i< data.length; i++) {%>  
+                                <% if (data.length) { 
+                                    for (var i = 0; i < data.length; i++) { %>
                                         <tr>
-                                            <th scope="row" class="text-center"><%= (i+1) %></th>
+                                            <th scope="row" class="text-center"><%= (i + 1) %></th>
                                             <td>
                                                 <img src="/uploads/<%= data[i].gambar_produk %>" alt="<%= data[i].gambar_produk %>" style="width: 130px; height: auto;">
                                             </td>
-                                            <td><%= data[i].nama_produk%></td>
-                                            <td><%= data[i].deskripsi%></td>
-                                            <td><%= data[i].stok%></td>
-                                            <td><%= data[i].harga%></td>
+                                            <td><%= data[i].nama_produk %></td>
+                                            <td><%= data[i].deskripsi %></td>
+                                            <td><%= data[i].stok %></td>
+                                            <td><%= data[i].harga %></td>
                                             <td class="text-center">
-                                                <a href="/posts/edit/<%=data[i].id%>" class="btn btn-sm btn-primary">EDIT</a>
-                                                <a onclick="return alert('Are You sure?')" href="/posts/delete/<%=data[i].id%>" class="btn btn-sm btn-danger">HAPUS</a>
+                                                <a href="/posts/edit/<%= data[i].id %>" class="btn btn-sm btn-primary">EDIT</a>
+                                                <a onclick="return confirm('Are You sure?')" href="/posts/delete/<%= data[i].id %>" class="btn btn-sm btn-danger">HAPUS</a>
                                             </td>
                                         </tr>
                                     <% }
-                                    
-                                }else{ %>
+                                } else { %>
                                     <tr>
-                                        <td colspan="4">
+                                        <td colspan="7" class="text-center">
                                             <div class="alert alert-danger" role="alert">
-                                                Data Tidak Ditemukan !
+                                                Data Tidak Ditemukan!
                                             </div>
                                         </td>
                                     </tr>
-                                <% } %>    
+                                <% } %>
                             </tbody>
                         </table>  
                     </div>
@@ -76,7 +187,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    </script>
-
 </body>
 </html>

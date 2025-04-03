@@ -8,42 +8,138 @@
     <title>Trendy</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        /* Global styling */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        /* Card styling */
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .card-body {
+            padding: 3rem;
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 16px;
+            background-color: #f7f7f7;
+        }
+
+        .form-control:focus {
+            border-color: #eb6715;
+            box-shadow: 0 0 0 0.2rem rgba(235, 103, 21, 0.25);
+        }
+
+        /* Button styling */
+        .btn-primary, .btn-warning {
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: #eb6715;
+            border-color: #eb6715;
+        }
+
+        .btn-primary:hover {
+            background-color: #d65b12;
+            border-color: #d65b12;
+            opacity: 0.9;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+        }
+
+        /* Image styling */
+        .form-group img {
+            border-radius: 8px;
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        /* Alert styling */
+        .alert {
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
 </head>
 
-<body style="background: lightgray">
+<body>
 
-    <div class="container mt-5">
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <% if (messages.error) { %>
                     <div class="alert alert-danger" role="alert"><%- messages.error %></div>
-                    <% } %>
+                <% } %>
+
                 <div class="card border-0 shadow rounded">
                     <div class="card-body">
                         <form action="/posts/update/<%= id %>" method="post" enctype="multipart/form-data">
                             <div class="form-group">
                                 <label>Gambar Produk</label>
-                                <div>   
-                                    <img src="/uploads/<%= gambar_produk %>" alt="<%= gambar_produk %>" style="width: 130px; height: auto;">
+                                <div>
+                                    <img src="/uploads/<%= gambar_produk %>" alt="<%= gambar_produk %>">
                                 </div>
                                 <input type="file" class="form-control" name="gambar_produk">
                                 <input type="hidden" name="old_gambar" value="<%= gambar_produk %>">
                             </div>
                             <div class="form-group">
                                 <label>Nama Produk</label>
-                                <input type="text" class="form-control" name="nama_produk" value="<%= nama_produk %>" placeholder="Masukkan Nama Post">
+                                <input type="text" class="form-control" name="nama_produk" value="<%= nama_produk %>"
+                                    placeholder="Masukkan Nama Produk">
                             </div>
                             <div class="form-group">
                                 <label>Deskripsi</label>
-                                <textarea class="form-control" name="deskripsi" rows="5" placeholder="Masukkan Deskripsi Post"><%= deskripsi %></textarea>
+                                <textarea class="form-control" name="deskripsi" rows="5"
+                                    placeholder="Masukkan Deskripsi Produk"><%= deskripsi %></textarea>
                             </div>
                             <div class="form-group">
                                 <label>Stok</label>
-                                <textarea class="form-control" name="stok" rows="5" placeholder="Masukkan Stok Post"><%= stok %></textarea>
+                                <textarea class="form-control" name="stok" rows="5" placeholder="Masukkan Stok Produk"><%= stok %></textarea>
                             </div>
                             <div class="form-group">
                                 <label>Harga</label>
-                                <textarea class="form-control" name="harga" rows="5" placeholder="Masukkan harga Post"><%= harga %></textarea>
+                                <textarea class="form-control" name="harga" rows="5" placeholder="Masukkan Harga Produk"><%= harga %></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary">UPDATE</button>
                             <button type="reset" class="btn btn-warning">RESET</button>
@@ -57,6 +153,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    </script>
+
 </body>
+
 </html>
